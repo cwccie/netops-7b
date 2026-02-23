@@ -1,0 +1,64 @@
+version: "3.8"
+
+services:
+  # Data curation (CPU only)
+  curate:
+    build: .
+    command: ["data", "curate", "-o", "/data/train.jsonl", "-n", "20000"]
+    volumes:
+      - ./data:/data
+
+  # Training (requires GPU)
+  train:
+    build: .
+    command: ["train", "run", "-d", "/data/train.jsonl", "-o", "/outputs/qlora"]
+    volumes:
+      - ./data:/data
+      - ./outputs:/outputs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - WANDB_API_KEY=${WANDB_API_KEY:-}
+      - HF_TOKEN=${HF_TOKEN:-}
+
+  # Evaluation (requires GPU)
+  eval:
+    build: .
+    command: ["eval", "run", "-m", "/outputs/qlora/final", "-t", "/data/test.jsonl", "-o", "/outputs/eval.json"]
+    volumes:
+      - ./data:/data
+      - ./outputs:/outputs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Demo (requires GPU)
+  demo:
+    build: .
+    command: ["demo", "-m", "/outputs/qlora/final", "-p", "7860"]
+    ports:
+      - "7860:7860"
+    volumes:
+      - ./outputs:/outputs
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Run tests (CPU only)
+  test:
+    build: .
+    entrypoint: ["pytest"]
+    command: ["tests/", "-v", "--tb=short"]
