@@ -104,7 +104,7 @@ docker compose run test
 | **Parameters** | ~7B total, ~26M trainable (LoRA) |
 | **Context Length** | 4096 tokens |
 | **License** | MIT |
-| **Author** | Corey A. Wade (CCIE #14124, CISSP, PhD candidate) |
+| **Author** | Corey A. Wade (CCIE #14124, CISSP, PhD) |
 
 ### Training Details
 
@@ -298,7 +298,7 @@ ruff format src/ tests/
 ## Author
 
 **Corey A. Wade**
-- CCIE #14124 | CISSP | PhD Candidate (AI + Security)
+- CCIE #14124 | CISSP | PhD (AI + Security)
 - GitHub: [@cwccie](https://github.com/cwccie)
 
 ---
